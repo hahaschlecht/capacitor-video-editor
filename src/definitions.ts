@@ -33,43 +33,29 @@ export interface VideoOptions {
 
 
 export interface Video {
+
   /**
-   * The base64 encoded string representation of the image, if using CameraResultType.Base64.
-   *
-   * @since 1.0.0
-   */
-  base64String?: string;
-  /**
-   * The url starting with 'data:image/jpeg;base64,' and the base64 encoded string representation of the image, if using CameraResultType.DataUrl.
-   *
-   * @since 1.0.0
-   */
-  dataUrl?: string;
-  /**
-   * If using CameraResultType.Uri, the path will contain a full,
+   * The path will contain a full,
    * platform-specific file URL that can be read later using the Filsystem API.
    *
    * @since 1.0.0
    */
-  path?: string;
+  path: string;
   /**
-   * webPath returns a path that can be used to set the src attribute of an image for efficient
+   * webPath returns a path that can be used to set the src attribute of an video element for efficient
    * loading and rendering.
    *
    * @since 1.0.0
    */
-  webPath?: string;
+  webPath: string;
   /**
-   * Exif data, if any, retrieved from the image
+   * Exif data, if any, retrieved from the video
    *
    * @since 1.0.0
    */
   exif?: any;
   /**
-   * The format of the image, ex: jpeg, png, gif.
-   *
-   * iOS and Android only support jpeg.
-   * Web supports jpeg and png. gif is only supported if using file input.
+   * The format of the video, ex: mp4, MOV, M4V.
    *
    * @since 1.0.0
    */
