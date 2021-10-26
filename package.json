@@ -1,7 +1,7 @@
 {
   "name": "capacitor-video-editor",
   "version": "0.0.1",
-  "description": "coming soon",
+  "description": "A small plugin to pick videos from the camera roll and edit them.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -17,10 +17,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://comingsoon.git"
+    "url": "git+https://github.com/hahaschlecht/capacitor-video-editor.git"
   },
   "bugs": {
-    "url": "https://comingsoon/issues"
+    "url": "https://github.com/hahaschlecht/capacitor-video-editor/issues"
   },
   "keywords": [
     "capacitor",

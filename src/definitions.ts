@@ -74,15 +74,5 @@ export interface Video {
    * @since 1.0.0
    */
   format: string;
-  /**
-   * Whether if the image was saved to the gallery or not.
-   *
-   * On Android and iOS, saving to the gallery can fail if the user didn't
-   * grant the required permissions.
-   * On Web there is no gallery, so always returns false.
-   *
-   * @since 1.1.0
-   */
-  saved: boolean;
 }
 
