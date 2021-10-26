@@ -1,6 +1,8 @@
 # capacitor-video-editor
 
-A small plugin to pick videos from the camera roll and edit them.
+This Plugin is still under development. Please do not use it, yet.  
+
+A plugin to pick videos from the camera roll and edit them.
 
 ## Install
 
