@@ -2,8 +2,6 @@ import type { PermissionState } from '@capacitor/core';
 
 
 export interface VideoEditorPlugin {
-  echo(options: { value: string }): Promise<{ value: string }>;
-
   getVideos(options: VideoOptions): Promise<Video[]>;
 
   checkPermissions(): Promise<PermissionStatus>;
