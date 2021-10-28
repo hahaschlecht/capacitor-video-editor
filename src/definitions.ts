@@ -2,7 +2,7 @@ import type { PermissionState } from '@capacitor/core';
 
 
 export interface VideoEditorPlugin {
-  getVideos(options: VideoOptions): Promise<Video[]>;
+  getVideos(options: VideoOptions): Promise<ReturnVideos>;
 
   checkPermissions(): Promise<PermissionStatus>;
 
@@ -27,6 +27,10 @@ export interface VideoEditorPluginPermissions {
 export interface VideoOptions {
   /* 0 equals to unlimited?!*/
   maxVideos?: number;
+}
+
+export interface ReturnVideos {
+  videos: Video[];
 }
 
 
@@ -58,5 +62,11 @@ export interface Video {
    * @since 1.0.0
    */
   format: string;
+  /**
+   * The URL of the generated thumbnail
+   *
+   * @since 1.0.0
+   */
+  thumbnail?: string;
 }
 

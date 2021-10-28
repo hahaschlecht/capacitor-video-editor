@@ -1,6 +1,6 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { PermissionStatus, Video, VideoEditorPlugin, VideoEditorPluginPermissions } from './definitions';
+import type { PermissionStatus, ReturnVideos, VideoEditorPlugin, VideoEditorPluginPermissions } from './definitions';
 
 export class VideoEditorWeb extends WebPlugin implements VideoEditorPlugin {
   async echo(options: { value: string }): Promise<{ value: string }> {
@@ -8,7 +8,7 @@ export class VideoEditorWeb extends WebPlugin implements VideoEditorPlugin {
     return options;
   }
 
-  async getVideos(): Promise<Video[]> {
+  async getVideos(): Promise<ReturnVideos> {
     return Promise.reject(
       new Error('CapacitorVideoEditor does not have web implementation'),
     );

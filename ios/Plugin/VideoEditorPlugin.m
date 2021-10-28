@@ -6,5 +6,5 @@
 CAP_PLUGIN(VideoEditorPlugin, "VideoEditor",
            CAP_PLUGIN_METHOD(checkPermissions, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(requestPermissions, CAPPluginReturnPromise);
-           CAP_PLUGIN_METHOD(getVideos, CAPPluginReturnPromise);           
+           CAP_PLUGIN_METHOD(getVideos, CAPPluginReturnPromise); 
 )

@@ -3,11 +3,11 @@ import Capacitor
 import Photos
 import PhotosUI
 
-
 @objc(VideoEditorPlugin)
 public class VideoEditorPlugin: CAPPlugin {
     private var call: CAPPluginCall?
     private var settings = VideoSettings(maxVideos: 0)
+    
     
     
     @objc override public func checkPermissions(_ call: CAPPluginCall) {
@@ -111,7 +111,7 @@ extension VideoEditorPlugin: PHPickerViewControllerDelegate {
                     }
                     
                     
-                    let fileName = "\(Int(Date().timeIntervalSince1970)).\(url.pathExtension)"
+                    let fileName = "video_\(Int(Date().timeIntervalSince1970))\(UUID().uuidString).\(url.pathExtension)"
                     let newUrl = URL(fileURLWithPath: NSTemporaryDirectory() + fileName)
                     
                     try? FileManager.default.copyItem(at: url, to: newUrl)
@@ -122,13 +122,34 @@ extension VideoEditorPlugin: PHPickerViewControllerDelegate {
                         processGroup.leave();
                         return
                     }
+                    
+                    
+                    
+                    let string1 = "-i ";
+                    let string2 = " -y -ss 00:00:01.000 -vframes 1 ";
+                    let thumbFileName = "thumb_\(Int(Date().timeIntervalSince1970))\(UUID().uuidString).png";
+                    let thumbUrl = URL(fileURLWithPath: NSTemporaryDirectory() + thumbFileName)
+                    
+                    let command = string1 + newUrl.absoluteString + string2 + thumbUrl.absoluteString;
+                    
+                    print("FFMPEG start")
+
+                    FFmpegKit.execute(command);
+                    
+                    print("FFMPEG finish?!")
+                    guard let thumbLink = self.bridge?.portablePath(fromLocalURL: thumbUrl) else {
+                        self.call?.reject("Unable to get portable path to file")
+                        print("error video")
+                        processGroup.leave();
+                        return
+                    }
+                    
                     let video: PluginCallResultData = [
-                        "webPath": test.absoluteString
+                        "webPath": test.absoluteString,
+                        "thumbnail": thumbLink.absoluteString,
+                        "format": ".mp4"
                     ]
-                    //                        self.call?.resolve(["webPath": test.absoluteString])
-                    print("got video", video, "link", test.absoluteString)
                     ReturnVideos.append(video)
-                    print("finished video")
                     processGroup.leave();
                 }
             }
