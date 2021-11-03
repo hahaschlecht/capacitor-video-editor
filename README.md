@@ -90,8 +90,8 @@ requestPermissions(permissions?: VideoEditorPluginPermissions | undefined) => an
 | **`path`**      | <code>string</code> | The path will contain a full, platform-specific file URL that can be read later using the Filsystem API.                  | 1.0.0 |
 | **`webPath`**   | <code>string</code> | webPath returns a path that can be used to set the src attribute of an video element for efficient loading and rendering. | 1.0.0 |
 | **`exif`**      | <code>any</code>    | Exif data, if any, retrieved from the video                                                                               | 1.0.0 |
-| **`format`**    | <code>string</code> | The format of the video, ex: mp4, MOV, M4V.                                                                               | 1.0.0 |
-| **`thumbnail`** | <code>string</code> | The URL of the generated thumbnail                                                                                        | 1.0.0 |
+| **`thumbnail`** | <code>string</code> | The webpath to the generated thumbnail                                                                                    | 1.0.0 |
+| **`duration`**  | <code>string</code> | The duration of the video in seconds                                                                                      | 1.0.0 |
 
 
 #### PermissionStatus

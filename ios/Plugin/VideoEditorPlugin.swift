@@ -144,10 +144,16 @@ extension VideoEditorPlugin: PHPickerViewControllerDelegate {
                         return
                     }
                     
+                    let info = FFprobeKit.getMediaInformation(newUrl.absoluteString).getMediaInformation();
+                    let duration = info?.getDuration()
+                
+                    print("GOT INFORMATION ON VIDEO DURATION", duration ?? "")
+                    
+                    
                     let video: PluginCallResultData = [
                         "webPath": test.absoluteString,
                         "thumbnail": thumbLink.absoluteString,
-                        "format": ".mp4"
+                        "duration" : duration ?? "",
                     ]
                     ReturnVideos.append(video)
                     processGroup.leave();

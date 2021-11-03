@@ -57,16 +57,16 @@ export interface Video {
    */
   exif?: any;
   /**
-   * The format of the video, ex: mp4, MOV, M4V.
+   * The webpath to the generated thumbnail
    *
    * @since 1.0.0
    */
-  format: string;
+  thumbnail: string;
   /**
-   * The URL of the generated thumbnail
+   * The duration of the video in seconds
    *
    * @since 1.0.0
    */
-  thumbnail?: string;
+  duration: string;
 }
 
