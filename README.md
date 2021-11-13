@@ -18,6 +18,8 @@ npx cap sync
 * [`getVideos(...)`](#getvideos)
 * [`checkPermissions()`](#checkpermissions)
 * [`requestPermissions(...)`](#requestpermissions)
+* [`trim(...)`](#trim)
+* [`concatVideos(...)`](#concatvideos)
 * [Interfaces](#interfaces)
 
 </docgen-index>
@@ -66,6 +68,36 @@ requestPermissions(permissions?: VideoEditorPluginPermissions | undefined) => an
 --------------------
 
 
+### trim(...)
+
+```typescript
+trim(options: TrimOptions) => any
+```
+
+| Param         | Type                                                |
+| ------------- | --------------------------------------------------- |
+| **`options`** | <code><a href="#trimoptions">TrimOptions</a></code> |
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### concatVideos(...)
+
+```typescript
+concatVideos(paths: ConcatItems) => any
+```
+
+| Param       | Type                                                |
+| ----------- | --------------------------------------------------- |
+| **`paths`** | <code><a href="#concatitems">ConcatItems</a></code> |
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
 ### Interfaces
 
 
@@ -90,8 +122,10 @@ requestPermissions(permissions?: VideoEditorPluginPermissions | undefined) => an
 | **`path`**      | <code>string</code> | The path will contain a full, platform-specific file URL that can be read later using the Filsystem API.                  | 1.0.0 |
 | **`webPath`**   | <code>string</code> | webPath returns a path that can be used to set the src attribute of an video element for efficient loading and rendering. | 1.0.0 |
 | **`exif`**      | <code>any</code>    | Exif data, if any, retrieved from the video                                                                               | 1.0.0 |
+| **`extension`** | <code>string</code> | format of the video                                                                                                       | 1.0.0 |
 | **`thumbnail`** | <code>string</code> | The webpath to the generated thumbnail                                                                                    | 1.0.0 |
 | **`duration`**  | <code>string</code> | The duration of the video in seconds                                                                                      | 1.0.0 |
+| **`size`**      | <code>string</code> | The size of the video in bytes                                                                                            | 1.0.0 |
 
 
 #### PermissionStatus
@@ -107,5 +141,31 @@ requestPermissions(permissions?: VideoEditorPluginPermissions | undefined) => an
 | Prop              | Type            |
 | ----------------- | --------------- |
 | **`permissions`** | <code>{}</code> |
+
+
+#### TrimOptions
+
+| Prop            | Type                |
+| --------------- | ------------------- |
+| **`start`**     | <code>string</code> |
+| **`end`**       | <code>string</code> |
+| **`path`**      | <code>string</code> |
+| **`extension`** | <code>string</code> |
+
+
+#### ConcatItems
+
+| Prop        | Type            |
+| ----------- | --------------- |
+| **`items`** | <code>{}</code> |
+
+
+#### ConcatItem
+
+| Prop           | Type                |
+| -------------- | ------------------- |
+| **`path`**     | <code>string</code> |
+| **`start`**    | <code>string</code> |
+| **`duration`** | <code>string</code> |
 
 </docgen-api>

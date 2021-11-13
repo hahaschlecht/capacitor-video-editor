@@ -9,11 +9,32 @@ export interface VideoEditorPlugin {
   requestPermissions(
     permissions?: VideoEditorPluginPermissions,
   ): Promise<PermissionStatus>;
+
+  trim(options: TrimOptions): Promise<Video>;
+  concatVideos(paths: ConcatItems): Promise<Video>;
 }
 
 export type CameraPermissionState = PermissionState | 'limited';
 
 export type CameraPermissionType = 'camera' | 'videos';
+
+export interface TrimOptions {
+  /* start and end in format HH:MM:SS eg.: 00:00:02 for 2seconds */
+  start: string;
+  end: string;
+  path: string;
+  extension: string;
+}
+
+export interface ConcatItems {
+  items: ConcatItem[]
+}
+
+export interface ConcatItem {
+  path: string;
+  start: string;
+  duration: string;
+}
 
 export interface PermissionStatus {
   camera: CameraPermissionState;
@@ -57,6 +78,12 @@ export interface Video {
    */
   exif?: any;
   /**
+   * format of the video
+   *
+   * @since 1.0.0
+   */
+  extension: string;
+  /**
    * The webpath to the generated thumbnail
    *
    * @since 1.0.0
@@ -68,5 +95,11 @@ export interface Video {
    * @since 1.0.0
    */
   duration: string;
+  /**
+   * The size of the video in bytes
+   *
+   * @since 1.0.0
+   */
+  size: string;
 }
 

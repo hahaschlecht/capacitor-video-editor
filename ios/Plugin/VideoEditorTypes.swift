@@ -24,3 +24,13 @@ public struct ReturnVideo {
     var exif: Any?;
     var format: String? = "";
 }
+
+public struct ConcatItem: Codable {
+    var path: String;
+    var start: String;
+    var duration: String;
+}
+
+public struct ConcatItems: Codable {
+    let items: [ConcatItems]
+}
