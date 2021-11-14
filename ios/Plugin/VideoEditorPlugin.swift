@@ -130,6 +130,8 @@ public class VideoEditorPlugin: CAPPlugin {
         // let filterCommand = getFilterCommand(amountVideos: count, start: "00:00:05.5", duration: "00:00:02.5")
         let command = inputCommands + filterCommand + outputUrl.absoluteString + y
         
+        print("command to be executed \(command)")
+        
         FFmpegKit.executeAsync(command, withExecuteCallback: {Session in
             let state = Session?.getState() ?? SessionState.failed
             print("STATE: \(state)")
@@ -374,10 +376,10 @@ private extension VideoEditorPlugin {
         }
         
         func getTrimVideo(index: Int, start: String, end: String) -> String {
-            return "[resize\(index)]trim=start=\(start):end=\(end)[ag\(index)];"
+            return "[resize\(index)]trim=start=\(start):end=\(end),setpts=PTS-STARTPTS[ag\(index)];"
         }
         func getTrimAudio(index: Int, start: String, end: String) -> String{
-            return "[audio\(index)]atrim=start=\(start):end=\(end)[au\(index)];"
+            return "[audio\(index)]atrim=start=\(start):end=\(end),asetpts=PTS-STARTPTS[au\(index)];"
         }
         
         func getVideo(index: Int) -> String{

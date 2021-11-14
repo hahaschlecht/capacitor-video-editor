@@ -11,6 +11,7 @@ export interface VideoEditorPlugin {
   ): Promise<PermissionStatus>;
 
   trim(options: TrimOptions): Promise<Video>;
+
   concatVideos(paths: ConcatItems): Promise<Video>;
 }
 
@@ -27,10 +28,12 @@ export interface TrimOptions {
 }
 
 export interface ConcatItems {
-  items: ConcatItem[]
+  items: ConcatItem[];
 }
 
 export interface ConcatItem {
+  /*start and duration in seconds*/
+  /*duration actually is end -> will refactor later*/
   path: string;
   start: string;
   duration: string;
