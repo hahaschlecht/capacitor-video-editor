@@ -155,9 +155,10 @@ concatVideos(paths: ConcatItems) => any
 
 #### ConcatItems
 
-| Prop        | Type            |
-| ----------- | --------------- |
-| **`items`** | <code>{}</code> |
+| Prop         | Type                |
+| ------------ | ------------------- |
+| **`videos`** | <code>{}</code>     |
+| **`audio`**  | <code>string</code> |
 
 
 #### ConcatItem

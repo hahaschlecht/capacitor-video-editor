@@ -85,7 +85,11 @@ public class VideoEditorPlugin: CAPPlugin {
     
     @objc func concatVideos(_ call: CAPPluginCall) {
         self.call = call
-        let items = call.getArray("items") ?? JSArray()
+        
+        let audio = call.getString("audio")
+        
+        let items = call.getArray("videos") ?? JSArray()
+    
         
         var concatItems: [ConcatItem] = [];
         
@@ -107,6 +111,8 @@ public class VideoEditorPlugin: CAPPlugin {
                return
             }
             
+            
+            
             let item = ConcatItem(path: path, start: start, duration: duration)
             
             
@@ -114,13 +120,15 @@ public class VideoEditorPlugin: CAPPlugin {
             
         }
         
-        print("got my items \(concatItems)")
-        
-        let filterCommand = getFilterCommand(videos: concatItems)
+        let filterCommand = getFilterCommand(videos: concatItems, audio: audio)
         
         var inputCommands = "";
         for video in concatItems  {
             inputCommands = "\(inputCommands) \(getInputCommand(path: video.path))"
+        }
+        
+        if audio != nil {
+           inputCommands = "\(inputCommands) \(getInputCommand(path: audio!))"
         }
         
         let outputName = getRandomFileName(prefix: "concat_video", pathExtension: "mp4")
@@ -129,8 +137,6 @@ public class VideoEditorPlugin: CAPPlugin {
         
         // let filterCommand = getFilterCommand(amountVideos: count, start: "00:00:05.5", duration: "00:00:02.5")
         let command = inputCommands + filterCommand + outputUrl.absoluteString + y
-        
-        print("command to be executed \(command)")
         
         FFmpegKit.executeAsync(command, withExecuteCallback: {Session in
             let state = Session?.getState() ?? SessionState.failed
@@ -141,17 +147,19 @@ public class VideoEditorPlugin: CAPPlugin {
             if (state == SessionState.completed){
                 guard let webPath = self.bridge?.portablePath(fromLocalURL: outputUrl) else {
                     self.call?.reject("Unable to get portable path to file")
-                    print("error video")
                     return
                 }
 
                 let info = FFprobeKit.getMediaInformation(outputUrl.absoluteString).getMediaInformation();
                 let duration = info?.getDuration()
                 let size = info?.getSize()
+    
+                
+                let thumb = self.getThumbnail(url: outputUrl, at: "00:00:01.000")
 
                 let video: PluginCallResultData = [
                     "webPath": webPath.absoluteString,
-                    "thumbnail": "",
+                    "thumbnail": thumb,
                     "duration" : duration ?? "",
                     "path": outputUrl.absoluteString,
                     "extension": "mp4",
@@ -214,26 +222,8 @@ extension VideoEditorPlugin: PHPickerViewControllerDelegate {
                         return
                     }
                     
-                    
-                    
-                    let string1 = "-i ";
-                    let string2 = " -y -ss 00:00:01.000 -vframes 1 ";
-                    let thumbFileName = "thumb_\(Int(Date().timeIntervalSince1970))\(UUID().uuidString).png";
-                    let thumbUrl = URL(fileURLWithPath: NSTemporaryDirectory() + thumbFileName)
-                    
-                    let command = string1 + newUrl.absoluteString + string2 + thumbUrl.absoluteString;
-                    
-                    
-                    
-                    FFmpegKit.execute(command);
-                    
-                    
-                    guard let thumbLink = self.bridge?.portablePath(fromLocalURL: thumbUrl) else {
-                        self.call?.reject("Unable to get portable path to file")
-                        print("error video")
-                        processGroup.leave();
-                        return
-                    }
+                    let thumb = self.getThumbnail(url: newUrl, at: "00:00:01.000")
+
                     
                     let info = FFprobeKit.getMediaInformation(newUrl.absoluteString).getMediaInformation();
                     let duration = info?.getDuration()
@@ -244,7 +234,7 @@ extension VideoEditorPlugin: PHPickerViewControllerDelegate {
                     
                     let video: PluginCallResultData = [
                         "webPath": test.absoluteString,
-                        "thumbnail": thumbLink.absoluteString,
+                        "thumbnail": thumb,
                         "duration" : duration ?? "",
                         "path": newUrl.absoluteString,
                         "extension": String(fileExtension)
@@ -364,7 +354,7 @@ private extension VideoEditorPlugin {
         return "-i \(path)"
     }
     
-    func getFilterCommand(videos: [ConcatItem]) -> String{
+    func getFilterCommand(videos: [ConcatItem], audio: String?) -> String{
         let width = "1080"
         let height = "1920"
         func getVideoFilter(index: Int) -> String {
@@ -372,13 +362,17 @@ private extension VideoEditorPlugin {
         }
         
         func getAudioFilter(index: Int) -> String{
-            return "[\(index):a]aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo,asetpts=PTS-STARTPTS[audio\(index)];"
+            return "[\(index):a]aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo,volume=0.2,asetpts=PTS-STARTPTS[audio\(index)];"
         }
         
         func getTrimVideo(index: Int, start: String, end: String) -> String {
             return "[resize\(index)]trim=start=\(start):end=\(end),setpts=PTS-STARTPTS[ag\(index)];"
         }
         func getTrimAudio(index: Int, start: String, end: String) -> String{
+            return "[audio\(index)]atrim=start=\(start):end=\(end),asetpts=PTS-STARTPTS[au\(index)];"
+        }
+        
+        func getTrimAudioLowerVolume(index: Int, start: String, end: String) -> String{
             return "[audio\(index)]atrim=start=\(start):end=\(end),asetpts=PTS-STARTPTS[au\(index)];"
         }
         
@@ -391,11 +385,11 @@ private extension VideoEditorPlugin {
         }
         
         func getConcat(amount: Int) -> String {
-            return "concat=n=\(amount):v=1:a=1[v][a]\""
+            return "concat=n=\(amount):v=1:a=1[v][a]"
         }
         
         func getAudioMixer(index: Int) -> String {
-            return "[\(index)]amix[a]"
+            return ";[a][\(index)]amix[a]"
         }
         
         var commandString = " -filter_complex \""
@@ -412,17 +406,28 @@ private extension VideoEditorPlugin {
             i += 1
         }
         
+        
         i = 0
         while i < videos.count {
             commandString = "\(commandString)" + getTrimVideo(index: i, start: videos[i].start, end: videos[i].duration)
             i += 1
         }
         
-        i = 0
-        while i < videos.count {
-            commandString = "\(commandString)" + getTrimAudio(index: i, start: videos[i].start, end: videos[i].duration)
-            i += 1
+        if audio != nil {
+            i = 0
+            while i < videos.count {
+                commandString = "\(commandString)" + getTrimAudioLowerVolume(index: i, start: videos[i].start, end: videos[i].duration)
+                i += 1
+            }
+        } else {
+            i = 0
+            while i < videos.count {
+                commandString = "\(commandString)" + getTrimAudio(index: i, start: videos[i].start, end: videos[i].duration)
+                i += 1
+            }
         }
+        
+        
         
         i = 0
         while i < videos.count {
@@ -430,7 +435,18 @@ private extension VideoEditorPlugin {
             i += 1
         }
         
-        commandString = "\(commandString)" + getConcat(amount: videos.count) + " -map [v] -map [a] "
+        commandString = "\(commandString)" + getConcat(amount: videos.count)
+        
+        
+        if audio != nil {
+            commandString = "\(commandString)" + getAudioMixer(index: videos.count)
+        }
+        
+        commandString = commandString + "\" -map [v] -map [a] "
+        
+        if audio != nil {
+            commandString = commandString + "-map \(videos.count):a "
+        }
     
         
         return commandString
@@ -442,6 +458,23 @@ private extension VideoEditorPlugin {
     
     func getUrl(fileName: String) -> URL{
         return URL(fileURLWithPath: NSTemporaryDirectory() + fileName)
+    }
+    
+    func getThumbnail(url: URL, at: String)-> String{
+        let string1 = "-i ";
+        let string2 = " -y -ss \(at) -vframes 1 -filter:v scale=\"280:-1\" ";
+        let thumbFileName = "thumb_\(Int(Date().timeIntervalSince1970))\(UUID().uuidString).png";
+        let thumbUrl = URL(fileURLWithPath: NSTemporaryDirectory() + thumbFileName)
+        
+        let command = string1 + url.absoluteString + string2 + thumbUrl.absoluteString;
+        
+        FFmpegKit.execute(command);
+        
+        guard let thumbLink = self.bridge?.portablePath(fromLocalURL: thumbUrl) else {
+            self.call?.reject("Unable to get portable path to file")
+        return ""
+        }
+        return thumbLink.absoluteString
     }
     
     

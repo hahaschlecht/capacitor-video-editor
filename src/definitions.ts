@@ -28,7 +28,8 @@ export interface TrimOptions {
 }
 
 export interface ConcatItems {
-  items: ConcatItem[];
+  videos: ConcatItem[];
+  audio?: string;
 }
 
 export interface ConcatItem {
