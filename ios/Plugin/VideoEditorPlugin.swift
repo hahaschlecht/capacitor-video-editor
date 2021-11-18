@@ -7,7 +7,7 @@ import JavaScriptCore
 @objc(VideoEditorPlugin)
 public class VideoEditorPlugin: CAPPlugin {
     private var call: CAPPluginCall?
-    private var settings = VideoSettings(maxVideos: 0)
+    private var settings = VideoSettings(maxVideos: 0, amountThumbnails: 1)
     
     
     
@@ -67,6 +67,7 @@ public class VideoEditorPlugin: CAPPlugin {
     @objc func getVideos(_ call: CAPPluginCall) {
         self.call = call
         self.settings.maxVideos = call.getInt("maxVideos") ?? 0
+        self.settings.amountThumbnails = call.getInt("amountThumbnails") ?? 1
         
         DispatchQueue.main.async {
             self.showVideos()
@@ -89,6 +90,8 @@ public class VideoEditorPlugin: CAPPlugin {
         let audio = call.getString("audio")
         
         let items = call.getArray("videos") ?? JSArray()
+        
+        let amountThumnails = call.getInt("amountThumbnails") ?? 1
     
         
         var concatItems: [ConcatItem] = [];
@@ -151,16 +154,21 @@ public class VideoEditorPlugin: CAPPlugin {
                 }
 
                 let info = FFprobeKit.getMediaInformation(outputUrl.absoluteString).getMediaInformation();
-                let duration = info?.getDuration()
+                let duration = info?.getDuration() ?? ""
                 let size = info?.getSize()
+                print("hello from thumbnail amount \(amountThumnails)")
+                for n in [amountThumnails] {
+                    print("hello from thumbnail \(n)")
+                }
     
                 
-                let thumb = self.getThumbnail(url: outputUrl, at: "00:00:01.000")
+               // let thumb = self.getThumbnail(url: outputUrl, at: "00:00:01.000")
+                let thumbnails = self.getThumbnail(url: outputUrl, duration: duration)
 
                 let video: PluginCallResultData = [
                     "webPath": webPath.absoluteString,
-                    "thumbnail": thumb,
-                    "duration" : duration ?? "",
+                    "thumbnails": thumbnails,
+                    "duration" : duration,
                     "path": outputUrl.absoluteString,
                     "extension": "mp4",
                     "size": size ?? ""
@@ -221,21 +229,25 @@ extension VideoEditorPlugin: PHPickerViewControllerDelegate {
                         processGroup.leave();
                         return
                     }
+                    print("hello from thumbnail amount raw \(self.settings.amountThumbnails)")
                     
-                    let thumb = self.getThumbnail(url: newUrl, at: "00:00:01.000")
-
                     
                     let info = FFprobeKit.getMediaInformation(newUrl.absoluteString).getMediaInformation();
-                    let duration = info?.getDuration()
+                    let duration = info?.getDuration() ?? ""
                     let fileExtension = URL(fileURLWithPath: info?.getFilename() ?? "").pathExtension
                     
-                    print("GOT INFORMATION ON VIDEO DURATION", duration ?? "")
+                    // let thumb = self.getThumbnail(url: newUrl, at: "00:00:01.000")
+                    
+                    
+                    let thumbnails = self.getThumbnail(url: newUrl, duration: duration)
+                    
+                    // print("GOT INFORMATION ON VIDEO DURATION", thumbnails)
                     
                     
                     let video: PluginCallResultData = [
                         "webPath": test.absoluteString,
-                        "thumbnail": thumb,
-                        "duration" : duration ?? "",
+                        "thumbnails": thumbnails,
+                        "duration" : duration,
                         "path": newUrl.absoluteString,
                         "extension": String(fileExtension)
                     ]
@@ -460,25 +472,42 @@ private extension VideoEditorPlugin {
         return URL(fileURLWithPath: NSTemporaryDirectory() + fileName)
     }
     
-    func getThumbnail(url: URL, at: String)-> String{
-        let string1 = "-i ";
-        let string2 = " -y -ss \(at) -vframes 1 -filter:v scale=\"280:-1\" ";
-        let thumbFileName = "thumb_\(Int(Date().timeIntervalSince1970))\(UUID().uuidString).png";
-        let thumbUrl = URL(fileURLWithPath: NSTemporaryDirectory() + thumbFileName)
+    func getThumbnail(url: URL, duration: String)-> [String]{
+        let amount = self.settings.amountThumbnails
+        let amountThumbnailsArray = Array(1...amount)
+        let durationDouble = Double(duration)  ?? 0.0
+        let interval: TimeInterval = (durationDouble - 0.002) / Double(amount)
         
-        let command = string1 + url.absoluteString + string2 + thumbUrl.absoluteString;
+        print("what is it?!\(durationDouble) \(Double(amount)) \(interval)")
+        let string1 = "-i ";
+        let string2 = " -vf fps=1/\(interval) ";
+       
+        // let string2 = " -y -vf fps=\(Int(interval)) ";
+        let uuid = UUID().uuidString
+        let thumbFileName = "thumb_\(uuid)_\u{0025}d.jpg";
+        print("what is it?! name.. \(thumbFileName)")
+        let thumbUrl = URL(fileURLWithPath: NSTemporaryDirectory() + thumbFileName).absoluteString.removingPercentEncoding ?? ""
+        print("what is it?! url.. \(thumbUrl)")
+        print("url \(thumbUrl)")
+        let y = " -y"
+
+        let command = string1 + url.absoluteString + string2 + thumbUrl + y;
         
         FFmpegKit.execute(command);
         
-        guard let thumbLink = self.bridge?.portablePath(fromLocalURL: thumbUrl) else {
-            self.call?.reject("Unable to get portable path to file")
-        return ""
+        var thumbnails: [String] = []
+        
+        for n in amountThumbnailsArray {
+            let url = URL(fileURLWithPath: NSTemporaryDirectory() + "thumb_\(uuid)_\(n).jpg")
+            print("url out \(url)")
+            guard  let thumb = self.bridge?.portablePath(fromLocalURL: url) else {
+                self.call?.reject("Unable to get portable path to file")
+                return []
+            }
+            thumbnails.append(thumb.absoluteString)
         }
-        return thumbLink.absoluteString
+        return thumbnails
     }
-    
-    
-    
 }
 
 

@@ -12,7 +12,7 @@ export interface VideoEditorPlugin {
 
   trim(options: TrimOptions): Promise<Video>;
 
-  concatVideos(paths: ConcatItems): Promise<Video>;
+  concatVideos(paths: ConcatOptions): Promise<Video>;
 }
 
 export type CameraPermissionState = PermissionState | 'limited';
@@ -27,9 +27,16 @@ export interface TrimOptions {
   extension: string;
 }
 
-export interface ConcatItems {
+/**
+ * The path will contain a full,
+ * platform-specific file URL that can be read later using the Filsystem API.
+ *
+ * @since 1.0.0
+ */
+export interface ConcatOptions {
   videos: ConcatItem[];
   audio?: string;
+  amountThumbnails?: number;
 }
 
 export interface ConcatItem {
@@ -52,6 +59,7 @@ export interface VideoEditorPluginPermissions {
 export interface VideoOptions {
   /* 0 equals to unlimited?!*/
   maxVideos?: number;
+  amountThumbnails?: number
 }
 
 export interface ReturnVideos {
@@ -88,11 +96,11 @@ export interface Video {
    */
   extension: string;
   /**
-   * The webpath to the generated thumbnail
+   * The webpaths to the generated thumbnails
    *
    * @since 1.0.0
    */
-  thumbnail: string;
+  thumbnails: [string];
   /**
    * The duration of the video in seconds
    *

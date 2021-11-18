@@ -16,6 +16,7 @@ internal enum CameraPermissionType: String, CaseIterable {
 
 public struct VideoSettings {
     var maxVideos: Int
+    var amountThumbnails: Int
 }
 
 public struct ReturnVideo {

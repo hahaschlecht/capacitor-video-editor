@@ -86,12 +86,12 @@ trim(options: TrimOptions) => any
 ### concatVideos(...)
 
 ```typescript
-concatVideos(paths: ConcatItems) => any
+concatVideos(paths: ConcatOptions) => any
 ```
 
-| Param       | Type                                                |
-| ----------- | --------------------------------------------------- |
-| **`paths`** | <code><a href="#concatitems">ConcatItems</a></code> |
+| Param       | Type                                                    |
+| ----------- | ------------------------------------------------------- |
+| **`paths`** | <code><a href="#concatoptions">ConcatOptions</a></code> |
 
 **Returns:** <code>any</code>
 
@@ -103,9 +103,10 @@ concatVideos(paths: ConcatItems) => any
 
 #### VideoOptions
 
-| Prop            | Type                |
-| --------------- | ------------------- |
-| **`maxVideos`** | <code>number</code> |
+| Prop                   | Type                |
+| ---------------------- | ------------------- |
+| **`maxVideos`**        | <code>number</code> |
+| **`amountThumbnails`** | <code>number</code> |
 
 
 #### ReturnVideos
@@ -117,15 +118,15 @@ concatVideos(paths: ConcatItems) => any
 
 #### Video
 
-| Prop            | Type                | Description                                                                                                               | Since |
-| --------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------- | ----- |
-| **`path`**      | <code>string</code> | The path will contain a full, platform-specific file URL that can be read later using the Filsystem API.                  | 1.0.0 |
-| **`webPath`**   | <code>string</code> | webPath returns a path that can be used to set the src attribute of an video element for efficient loading and rendering. | 1.0.0 |
-| **`exif`**      | <code>any</code>    | Exif data, if any, retrieved from the video                                                                               | 1.0.0 |
-| **`extension`** | <code>string</code> | format of the video                                                                                                       | 1.0.0 |
-| **`thumbnail`** | <code>string</code> | The webpath to the generated thumbnail                                                                                    | 1.0.0 |
-| **`duration`**  | <code>string</code> | The duration of the video in seconds                                                                                      | 1.0.0 |
-| **`size`**      | <code>string</code> | The size of the video in bytes                                                                                            | 1.0.0 |
+| Prop             | Type                  | Description                                                                                                               | Since |
+| ---------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **`path`**       | <code>string</code>   | The path will contain a full, platform-specific file URL that can be read later using the Filsystem API.                  | 1.0.0 |
+| **`webPath`**    | <code>string</code>   | webPath returns a path that can be used to set the src attribute of an video element for efficient loading and rendering. | 1.0.0 |
+| **`exif`**       | <code>any</code>      | Exif data, if any, retrieved from the video                                                                               | 1.0.0 |
+| **`extension`**  | <code>string</code>   | format of the video                                                                                                       | 1.0.0 |
+| **`thumbnails`** | <code>[string]</code> | The webpaths to the generated thumbnails                                                                                  | 1.0.0 |
+| **`duration`**   | <code>string</code>   | The duration of the video in seconds                                                                                      | 1.0.0 |
+| **`size`**       | <code>string</code>   | The size of the video in bytes                                                                                            | 1.0.0 |
 
 
 #### PermissionStatus
@@ -153,12 +154,16 @@ concatVideos(paths: ConcatItems) => any
 | **`extension`** | <code>string</code> |
 
 
-#### ConcatItems
+#### ConcatOptions
 
-| Prop         | Type                |
-| ------------ | ------------------- |
-| **`videos`** | <code>{}</code>     |
-| **`audio`**  | <code>string</code> |
+The path will contain a full,
+platform-specific file URL that can be read later using the Filsystem API.
+
+| Prop                   | Type                |
+| ---------------------- | ------------------- |
+| **`videos`**           | <code>{}</code>     |
+| **`audio`**            | <code>string</code> |
+| **`amountThumbnails`** | <code>number</code> |
 
 
 #### ConcatItem
