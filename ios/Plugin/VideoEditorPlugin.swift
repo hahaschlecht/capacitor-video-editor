@@ -384,6 +384,9 @@ private extension VideoEditorPlugin {
             return "[audio\(index)]atrim=start=\(start):end=\(end),asetpts=PTS-STARTPTS[au\(index)];"
         }
         
+        
+        // do we really need this? audio should not be regualted for videos that don't have voice overlay
+        
         func getTrimAudioLowerVolume(index: Int, start: String, end: String) -> String{
             return "[audio\(index)]atrim=start=\(start):end=\(end),asetpts=PTS-STARTPTS[au\(index)];"
         }
@@ -477,18 +480,11 @@ private extension VideoEditorPlugin {
         let amountThumbnailsArray = Array(1...amount)
         let durationDouble = Double(duration)  ?? 0.0
         let interval: TimeInterval = (durationDouble - 0.002) / Double(amount)
-        
-        print("what is it?!\(durationDouble) \(Double(amount)) \(interval)")
         let string1 = "-i ";
         let string2 = " -vf fps=1/\(interval) ";
-       
-        // let string2 = " -y -vf fps=\(Int(interval)) ";
         let uuid = UUID().uuidString
         let thumbFileName = "thumb_\(uuid)_\u{0025}d.jpg";
-        print("what is it?! name.. \(thumbFileName)")
         let thumbUrl = URL(fileURLWithPath: NSTemporaryDirectory() + thumbFileName).absoluteString.removingPercentEncoding ?? ""
-        print("what is it?! url.. \(thumbUrl)")
-        print("url \(thumbUrl)")
         let y = " -y"
 
         let command = string1 + url.absoluteString + string2 + thumbUrl + y;
